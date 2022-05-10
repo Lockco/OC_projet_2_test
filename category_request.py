@@ -1,19 +1,20 @@
-from lib2to3.pgen2 import literals
-from urllib.request import Request
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup as bs
 
 
-URL = 'https://books.toscrape.com/catalogue/category/books/fiction_10/'
 
+
+
+    
+URL = 'https://books.toscrape.com/catalogue/category/books/fiction_10/'
 
 response = requests.get(URL)
 doc = bs(response.text,'html.parser')
 
 class CategoryRequest:
 
-    def __init__(self,url = URL,doc =doc,nav_list_links=[],book_titles=[],rating=[],book_price=[],stock_availability=[],book_url=[],data_pages=[]):
+    def __init__(self,url = URL,doc =doc,nav_list_links=[],book_titles=[],rating=[],book_price=[],stock_availability=[],book_url=[],data_page=[],data_pages=[]):
         print('on passe par là')
         self.url = url
         self.doc = doc
@@ -23,11 +24,15 @@ class CategoryRequest:
         self.book_price = book_price
         self.stock_availability = stock_availability
         self.book_url= book_url
+        self.data_page = data_page
         self.data_pages = data_pages
+        
+
 
     def quit(self):
         print('Au revoir')
     
+ 
     
     def catch_nav_list_links(self):
         ''' Recuperation de la liste des categories, un première liste avec les titrtes et une deuxième avec les liens'''
@@ -60,7 +65,7 @@ class CategoryRequest:
         return book_titles
 
     def catch_rating(self):
-
+        """ Recuperation des notes """
         rating_book = doc.find_all('li', class_="col-xs-6 col-sm-4 col-md-3 col-lg-3")
         rating_list= []
         star = doc
@@ -110,11 +115,7 @@ class CategoryRequest:
     def catch_data_pages(self):
         """Export des informations au formats csv"""
         
-
         book_list = {'title' : CategoryRequest.catch_book_titles(self), 'price' : CategoryRequest.catch_book_price(self),'rate': CategoryRequest.catch_rating(self), 'stock' : CategoryRequest.catch_stock_availability(self), 'url' : CategoryRequest.catch_book_url(self)}
 
-        return pd.DataFrame(book_list).to_csv('test.csv')
-        
-        
-
-CategoryRequest.catch_data_pages(doc)
+        pd.DataFrame(book_list).to_csv('test.csv')
+        return self.data_page
