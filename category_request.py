@@ -3,9 +3,6 @@ import pandas as pd
 from bs4 import BeautifulSoup as bs
 
 
-
-
-
     
 URL = 'https://books.toscrape.com/catalogue/category/books/fiction_10/'
 
@@ -26,13 +23,7 @@ class CategoryRequest:
         self.book_url= book_url
         self.data_page = data_page
         self.data_pages = data_pages
-        
 
-
-    def quit(self):
-        print('Au revoir')
-    
- 
     
     def catch_nav_list_links(self):
         ''' Recuperation de la liste des categories, un première liste avec les titrtes et une deuxième avec les liens'''
@@ -41,7 +32,7 @@ class CategoryRequest:
         nav_list_links = doc.find('div', class_='side_categories')
         links_nav = []
         for links in nav_list_links.select('a[href]'):
-            links_nav.append(url + links['href'])
+            links_nav.append(url + links['href'].replace(' ',''))
            
         nav_list_title = doc.find('div', class_='side_categories')
         links_nav_title = []
@@ -50,8 +41,8 @@ class CategoryRequest:
 
         headers_list = {'tirtre': links_nav_title , 'liens': links_nav}
 
-        pd.DataFrame(headers_list).to_csv('list-categories.csv')
-        pd.read_csv('resultat.csv', usecols= [0])
+        pd.DataFrame(headers_list).to_csv('liste_categories.csv')
+        pd.read_csv('liste_categories.csv', usecols= [0])
         return self.nav_list_links
 
     def catch_book_titles(self):
@@ -61,7 +52,7 @@ class CategoryRequest:
         book_titles = []
         for title in book_title:
             book_titles.append(title.text)
-        print (len(book_titles))
+        
         return book_titles
 
     def catch_rating(self):
@@ -71,7 +62,7 @@ class CategoryRequest:
         star = doc
         for star in rating_book:
             rating_list.append(star.select("p:nth-of-type(1)")[0].get('class')[1])
-        print(len(rating_list))
+        
         return rating_list
 
     def catch_book_price(self):
@@ -82,17 +73,18 @@ class CategoryRequest:
         
         for tags in book_price_tags:
             book_price.append(tags.text.replace('Â', ''))
-        print(len(book_price))
+     
         return book_price
 
     def catch_stock_availability(self):
         """ Recuperation de la disponibilite """
+
         book_stock_tags = doc.find_all('p', class_ = 'instock availability')
         book_stock = []
 
         for tags in book_stock_tags:
             book_stock.append(tags.text.strip())
-        print(len(book_stock))
+
         return book_stock
     
     def catch_book_url(self):
@@ -117,5 +109,7 @@ class CategoryRequest:
         
         book_list = {'title' : CategoryRequest.catch_book_titles(self), 'price' : CategoryRequest.catch_book_price(self),'rate': CategoryRequest.catch_rating(self), 'stock' : CategoryRequest.catch_stock_availability(self), 'url' : CategoryRequest.catch_book_url(self)}
 
-        pd.DataFrame(book_list).to_csv('test.csv')
-        return self.data_page
+        pd.DataFrame(book_list).to_csv('resulat_categorie.csv')
+        
+
+CategoryRequest.catch_data_pages(doc)
