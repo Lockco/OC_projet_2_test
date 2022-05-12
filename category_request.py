@@ -111,5 +111,5 @@ class CategoryRequest:
 
         pd.DataFrame(book_list).to_csv('resulat_categorie.csv')
         
-
-CategoryRequest.catch_data_pages(doc)
+    
+CategoryRequest.catch_nav_list_links(doc)
