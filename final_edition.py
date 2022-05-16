@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import re
 from os.path  import basename
-from urllib.parse import urljoin
+#from urllib.parse import urljoin
 
 
 URL = 'https://books.toscrape.com/'
@@ -30,13 +30,15 @@ def catch_book_data():
     book_data = {}
 
     book_data['title'] = main.find('h1').get_text(strip=True)
-    book_data['price'] = main.find(class_='price_color').get_text(strip=True)
-    book_data['stock'] = main.find(class_='availability').get_text(strip=True)
-    book_data['rating'] = ' '.join(main.find(class_='star-rating') \
+    # book_data['category'] = main.find('ul', class_='breadcrumb')\
+    #                         .find_all('a')[0].get_text(strip=True)
+    book_data['price'] = main.find(class_='price_color').get_text(strip=True).replace('Â', '')
+    book_data['number_available'] = main.find(class_='availability').get_text(strip=True)
+    book_data['review_rating'] = ' '.join(main.find(class_='star-rating') \
                         .get('class')).replace('star-rating', '').strip()
     book_data['img'] = content_book_url.find(class_='thumbnail').find('img').get('src').replace('../../','https://books.toscrape.com/')
     desc = content_book_url.find(id='product_description')
-    book_data['description'] = ''
+    book_data['product_description'] = ''
 
     if desc:
         book_data['description'] = desc.find_next_sibling('p') \
@@ -47,7 +49,7 @@ def catch_book_data():
         header = re.sub('[^a-zA-Z]+', '_', header)
         value = row.find('td').get_text(strip=True).replace('Â', '')
         book_data[header] = value
-    #print(book_data)
+
     return book_data
 
 def catch_categories_url():
@@ -64,6 +66,10 @@ def catch_categories_url():
         categories_url.append(category_url)
         
     return categories_url
+
+# category_book = content.find('ul', class_='breadcrumb').find_all('a')[2].get_text(strip=True)
+# #category = category_book.find_all('a')[2].get_text(strip=True)
+# print(category_book)
 
 def catch_images():
     """ Recuperation des images"""
@@ -84,16 +90,17 @@ for link in catch_categories_url():
     content = result.text
     content_cat = bs(content, 'lxml')
 
-   
+    list_books = []
     for url in catch_book_url():
 
         print('extraction de la page : ', url)
         result_book_url = requests.get(url)
         content = result_book_url.text
         content_book_url = bs(content, 'lxml')
-        catch_book_data()     
-        print('Sauvegarde')
-    df = pd.DataFrame([catch_book_data()],index=[0]).to_csv('categories' + str(j) + '.csv', encoding = 'utf_8')
+        book = catch_book_data()
+        list_books.append(book)
+        print('Sauvegarde',book)
+    df = pd.DataFrame.from_dict(list_books).to_csv('categories' + str(j) + '.csv', encoding = 'utf-8')
     j += 1
 
 
