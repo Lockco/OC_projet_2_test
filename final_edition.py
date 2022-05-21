@@ -1,9 +1,7 @@
-from sys import flags
 from bs4 import BeautifulSoup as bs
 import requests
 import pandas as pd
 import re
-from os.path  import basename
 from urllib.parse import urljoin
 
 URL = 'https://books.toscrape.com/'
@@ -35,7 +33,7 @@ def catch_book_data():
     book_data['number_available'] = main.find(class_='availability').get_text(strip=True)
     book_data['review_rating'] = ' '.join(main.find(class_='star-rating') \
                         .get('class')).replace('star-rating', '').strip()
-    book_data['img'] = content_book_url.find(class_='thumbnail').find('img').get('src').replace('../../','https://books.toscrape.com/')
+    book_data['image_url'] = content_book_url.find(class_='thumbnail').find('img').get('src').replace('../../','https://books.toscrape.com/')
     desc = content_book_url.find(id='product_description')
 
     if desc:
@@ -47,7 +45,7 @@ def catch_book_data():
         header = re.sub('[^a-zA-Z]+', '_', header)
         value = row.find('td').get_text(strip=True).replace('Â', '')
         book_data[header] = value
-    print(book_data)
+    
     return book_data
 
 def catch_categories_url():
@@ -59,32 +57,55 @@ def catch_categories_url():
     for category in categories: 
 
         category_name = category.find('a').text.strip()
-        flag = 1
+        print(category_name)
+        page = 1
         while True:
             
-            category_url_relative = category.find('a').get('href').replace('index.html', f"page-{flag}.html")
-            flag +=1
+            if page == 1 :
+                category_url_relative = category.find('a').get('href')
+            else: 
+                category_url_relative = category.find('a').get('href').replace('index.html', f"page-{page}.html")
+
+            page +=1
             category_url = URL + category_url_relative
+            print(category_url)
             response = requests.get(category_url)
+            
             if response.status_code == 200:
                 categories_url.append(category_url)
                 categories_name.append(category_name)
             else:
                 break
-    
+   
     return categories_url
 
 def catch_images():
     """ Recuperation des images"""
 
-    images = CONTENT.find_all('img')
-    a,b = catch_categories_url()
-    for image in images:
-        name = image['alt']
-        link =(URL + image['src'])
-        print(link)
-        with open((f"data\images\{name}.jpg").replace(' ','').replace(':', ''), 'wb') as f:
-            f.write(requests.get(link).content)
+    page_url = catch_all_page_catalogue()
+
+    for links in page_url:
+        print('Extraction de la page : ', links)
+        result = requests.get(links)
+        content = result.text
+        content_page = bs(content, 'lxml')
+        
+        images = content_page.find_all('img')
+        print(images)
+        for image in images:
+            name = image['alt']
+            url =(URL + image['src'])
+            print(name)
+            #print(url)
+            # with open((f"data\images\{name}.jpg").replace("'",'')\
+            #     .replace(' ','').replace('?','').replace(':', '')\
+            #     .replace('...','').replace('*','').replace('\\',''), 'wb') as f:
+            #     f.write(requests.get(url).content)
+            name = re.sub(r"['-_&*é\s?:,.;$#+\\\/],*","", name)
+            print('nouveau nom',name)
+            #print(url)
+            with open((f"data\images\{name}.jpg"), 'wb') as f:
+                f.write(requests.get(url).content)
 
 def catch_all_url():
     
@@ -106,32 +127,49 @@ def catch_all_url():
             page_url.append(link)
     print(page_url)
 
+def catch_all_page_catalogue():
+    """ Recuperation des 50 pages du catologue"""
+    page = 1
+    pages_url = []
 
-print('on entre')
-j = 0
-categ_url = catch_categories_url
+    while True:
 
-for link in categ_url:
-    print('on entre')
-    result = requests.get(link)
-    content = result.text
-    content_cat = bs(content, 'lxml')
-    
+        page_url = (URL +'catalogue/' + f"page-{page}.html")
+        page += 1
+        response = requests.get(page_url)
+        #print(response.status_code)
+        if response.status_code == 200:
+            pages_url.append(page_url)
+        else:
+            break
+        print(page_url)
+    return pages_url
 
-    list_books = []
+catch_images()
 
-    for url in catch_book_url():
+# j = 0
+# categ_url = catch_categories_url()
 
-        print('extraction de la page : ', url)
-        result_book_url = requests.get(url)
-        content = result_book_url.text
-        content_book_url = bs(content, 'lxml')
-        book = catch_book_data()
-        list_books.append(book)
-        print('Sauvegarde',book)
-    df = pd.DataFrame.from_dict(list_books).to_csv('categories' + str(j) + '.csv', encoding = 'utf-8')
-    with open(("data\images\categorie.csv").replace(' ','').replace(':', ''), 'wb') as f:
-            f.write(requests.get(link).content)
-    j += 1
+# for link in categ_url:
+#     print('Extraction de la category : ', link)
+#     result = requests.get(link)
+#     content = result.text
+#     content_cat = bs(content, 'lxml')
+
+#     list_books = []
+
+#     for url in catch_book_url():
+        
+#         print('extraction de la page : ', url)
+#         result_book_url = requests.get(url)
+#         content = result_book_url.text
+#         content_book_url = bs(content, 'lxml')
+#         book = catch_book_data()
+        
+#         list_books.append(book)
+
+#     print('Sauvegarde',book)
+#     df = pd.DataFrame.from_dict(list_books).to_csv('categories' + str(j) + '.csv', encoding = 'utf-8')
+#     j += 1
 
 
