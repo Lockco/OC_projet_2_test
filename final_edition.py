@@ -146,24 +146,29 @@ def catch_all_page_catalogue():
 j = 0
 categ_url = catch_categories_url()
 
-for link in categ_url.keys():
+for link in categ_url.values():
     print('Extraction de la category : ', link)
-    result = requests.get(link)
-    content = result.text
-    content_cat = bs(content, 'lxml')
+    
+    for item in link:
+        print(item)
+        result = requests.get(item)
+        content = result.text
+        content_cat = bs(content, 'lxml')
 
-    list_books = []
+        list_books = []
 
-    for url in catch_book_url():
-        
-        print('extraction de la page : ', url)
-        result_book_url = requests.get(url)
-        content = result_book_url.text
-        content_book_url = bs(content, 'lxml')
-        book = catch_book_data()
-        
-        list_books.append(book)
+        for url in catch_book_url():
+                
+            print('extraction de la page : ', url)
+            result_book_url = requests.get(url)
+            content = result_book_url.text
+            content_book_url = bs(content, 'lxml')
+            book = catch_book_data()
+            
+            list_books.append(book)
 
-    print('Sauvegarde',book)
-    df = pd.DataFrame.from_dict(list_books).to_csv(f'categories.csv' + str(j) + '.csv', encoding = 'utf-8')
-    j += 1
+        print('Sauvegarde',book)
+        df = pd.DataFrame.from_dict(list_books).to_csv(f'categories.csv' + str(j) + '.csv', encoding = 'utf-8')
+        j += 1
+
+
