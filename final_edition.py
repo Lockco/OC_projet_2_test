@@ -52,12 +52,13 @@ def catch_categories_url():
     """ Recuperation des urls de chaque categories"""
 
     categories = CONTENT.find('ul', {'class': 'nav nav-list'}).find('li').find('ul').find_all('li')
-    categories_url= []
+    all_categories = {}
     categories_name = []
-    for category in categories: 
-
+    for category in categories[:3]: 
+        each_category_link = []
         category_name = category.find('a').text.strip()
         print(category_name)
+
         page = 1
         while True:
             
@@ -68,16 +69,18 @@ def catch_categories_url():
 
             page +=1
             category_url = URL + category_url_relative
-            print(category_url)
             response = requests.get(category_url)
             
             if response.status_code == 200:
-                categories_url.append(category_url)
+                each_category_link.append(category_url)
                 categories_name.append(category_name)
             else:
                 break
-   
-    return categories_url
+
+        all_categories[category_name] = each_category_link
+    
+    print(all_categories)
+    return all_categories
 
 def catch_images():
     """ Recuperation des images"""
@@ -96,14 +99,8 @@ def catch_images():
             name = image['alt']
             url =(URL + image['src'])
             print(name)
-            #print(url)
-            # with open((f"data\images\{name}.jpg").replace("'",'')\
-            #     .replace(' ','').replace('?','').replace(':', '')\
-            #     .replace('...','').replace('*','').replace('\\',''), 'wb') as f:
-            #     f.write(requests.get(url).content)
-            name = re.sub(r"['-_&*é\s?:,.;$#+\\\/],*","", name)
+            name = re.sub(r"['\"[\]{}()?\-\+*&é;:./!,$=#]*","",name)
             print('nouveau nom',name)
-            #print(url)
             with open((f"data\images\{name}.jpg"), 'wb') as f:
                 f.write(requests.get(url).content)
 
@@ -128,7 +125,7 @@ def catch_all_url():
     print(page_url)
 
 def catch_all_page_catalogue():
-    """ Recuperation des 50 pages du catologue"""
+    """ Recuperation des 50 pages du catologue pour récupérer les images"""
     page = 1
     pages_url = []
 
@@ -145,31 +142,28 @@ def catch_all_page_catalogue():
         print(page_url)
     return pages_url
 
-catch_images()
 
-# j = 0
-# categ_url = catch_categories_url()
+j = 0
+categ_url = catch_categories_url()
 
-# for link in categ_url:
-#     print('Extraction de la category : ', link)
-#     result = requests.get(link)
-#     content = result.text
-#     content_cat = bs(content, 'lxml')
+for link in categ_url.keys():
+    print('Extraction de la category : ', link)
+    result = requests.get(link)
+    content = result.text
+    content_cat = bs(content, 'lxml')
 
-#     list_books = []
+    list_books = []
 
-#     for url in catch_book_url():
+    for url in catch_book_url():
         
-#         print('extraction de la page : ', url)
-#         result_book_url = requests.get(url)
-#         content = result_book_url.text
-#         content_book_url = bs(content, 'lxml')
-#         book = catch_book_data()
+        print('extraction de la page : ', url)
+        result_book_url = requests.get(url)
+        content = result_book_url.text
+        content_book_url = bs(content, 'lxml')
+        book = catch_book_data()
         
-#         list_books.append(book)
+        list_books.append(book)
 
-#     print('Sauvegarde',book)
-#     df = pd.DataFrame.from_dict(list_books).to_csv('categories' + str(j) + '.csv', encoding = 'utf-8')
-#     j += 1
-
-
+    print('Sauvegarde',book)
+    df = pd.DataFrame.from_dict(list_books).to_csv(f'categories.csv' + str(j) + '.csv', encoding = 'utf-8')
+    j += 1
