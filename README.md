@@ -41,17 +41,17 @@ Le programme récupère puis exportents les informations suivantes au format csv
 
     
 
-    1. Depuis votre terminal, placez vous à l'endroit souhaité:
+    Depuis votre terminal, placez vous à l'endroit souhaité:
     
     ```cd [chemin d'accès]```  
     
-    2. Creer un nouveau dossier:
+    Creer un nouveau dossier:
     
     ```mkdir [nom de votre dossier]```
     
-    3. Copier le programme source:
+    Copier le programme source:
     
-    ```git clone https://github.com/Johannba/Projet2-scraping```
+    ```git clone https://github.com/Lockco/OC_projet_2```
     
     Vous devez voir (depuis votre explorateur) les fichiers suivants:
         * main.py
@@ -59,6 +59,7 @@ Le programme récupère puis exportents les informations suivantes au format csv
         * book.py
         * requirements.txt
     
+    ![](download_project.gif)
 
 2. **Creer un environnement virtuel.**
 
@@ -79,8 +80,9 @@ Le programme récupère puis exportents les informations suivantes au format csv
 
     ```pip install -r requirements.txt```
 
-    En executant la commande: ```pip freeze```, vous devez voir apparaitre cette liste: beautifulsoup4==4.11.1
+    En executant la commande: ```pip freeze```, vous devez voir apparaitre cette liste: 
 
+        beautifulsoup4==4.11.1
         certifi==2022.5.18.1
         charset-normalizer==2.0.12
         idna==3.3
