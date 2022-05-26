@@ -58,7 +58,7 @@ Le programme récupère puis exportents les informations suivantes au format csv
         * book.py
         * requirements.txt
     
-    ![](download_project.gif)
+    ![]
 
 
 2. **Installer les paquets.**
