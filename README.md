@@ -39,7 +39,6 @@ Le programme récupère puis exportents les informations suivantes au format csv
 
 1. **Téléchargement du projet.**
 
-    
 
     Depuis votre terminal, placez vous à l'endroit souhaité:
     
@@ -61,22 +60,8 @@ Le programme récupère puis exportents les informations suivantes au format csv
     
     ![](download_project.gif)
 
-2. **Creer un environnement virtuel.**
 
-    Depuis windows/mac/linux: ```python3 -m venv env```
-    
-
-3. **Activer l'environnement.**
-    
-    Depuis windows: ```env\Scripts\activate.bat``` si la commande précèdente ne fonctionne pas essayez ```env\Scripts\activate```
-    
-    Depuis mac/linux: ```source env/bin/activate```
-    
-    Si vous rencontrez des difficultés ou si vous souhaitez plus de détails sur l'installation d'un environnement virtuel, vous pouvez vous reporter à la documentation Python:
-    
-    [Documentation Python](https://docs.python.org/fr/3/library/venv.html?highlight=venv)  
-    
-4. **Installer les paquets.**
+2. **Installer les paquets.**
 
     ```pip install -r requirements.txt```
 
@@ -98,23 +83,35 @@ Le programme récupère puis exportents les informations suivantes au format csv
     
 5. **Lancement du programme**
 
-    ```pyhton __main__.py```
+    Pour le démarrage du programme dans votre terminal vérifier que vous êtes de le dossier où le projet a été cloné puis lancer le script à l'aide de la  commande suivante :
+
+    Pour vérifier le dossier dans lequel vous êtes :
+
+        ls
+
+    Pour lancer le programme :
+
+    ```py __main__.py```
 
     Lors du démarrage vous aurez le choix entre 3 options :
 
         1. Extraire les informations des livres : 
 
             L'option 1 lancera le script et va récupérer les informations de chaque livre par catégorie.
+            Cela créera un dossier nomé "data" puis l'extraction de chaque catégorie créera un dossier dans lequel vous trouverez le fichier .csv contenant les données récupérées.
 
-        2. Extraire les couvertures des livres
+        2. Extraire les couvertures des livres :
 
-            L'option 2 lancera le script et récupéra toutes les images depuis la page d'accueil
+            L'option 2 lancera le script et récupéra toutes les images depuis la page d'accueil.
+            Cela entrainera la création d'un dossier data (s'il n'existe pas encore) puis d'un dossier images dans lequel vous trouverez toutes les couvertures des livres au format .jpg.
 
-        3. Quitter l'application
+        3. Quitter l'application :
 
             L'option 3 vous permet de quitter l'application
+
+    ![]
             
-## Fabriqué avec
+## Codé avec
 [Visual Studio Code] (https://code.visualstudio.com/download) - Editeur de textes
 
 
